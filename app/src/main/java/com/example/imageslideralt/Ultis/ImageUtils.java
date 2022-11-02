@@ -222,6 +222,7 @@ public class ImageUtils {
     }
 
     public static class ImageFiles {
+        private File cursor;
         private final List<File> files;
 
         public ImageFiles(File... files) {
@@ -234,6 +235,61 @@ public class ImageUtils {
 
         public List<File> getFiles() {
             return files;
+        }
+
+        public ImageFiles apply(ImageView imageView)
+        {
+            imageView.setImageURI(Uri.fromFile(this.cursor));
+            return this;
+        }
+
+        public ImageFiles onCursor(Consumer<File> fileConsumer)
+        {
+            fileConsumer.accept(this.cursor);
+            return this;
+        }
+
+        public ImageFiles Next(File file)
+        {
+            int position = files.indexOf(file);
+            if (position == files.size() - 1)
+            {
+                position = 0;
+                this.cursor = files.get(position);
+
+            }
+            else if (files.size() == 1)
+            {
+                position = 0;
+                this.cursor = files.get(position);
+            }
+            else
+            {
+                this.cursor = files.get(position + 1);
+            }
+
+            return this;
+        }
+        public ImageFiles Previous(File file)
+        {
+            int position = files.indexOf(file);
+            if (position == 0)
+            {
+                position = files.size() - 1;
+                this.cursor = files.get(position);
+
+            }
+            else if (files.size() == 1)
+            {
+                position = 0;
+                this.cursor = files.get(position);
+            }
+            else
+            {
+                this.cursor = files.get(position - 1);
+            }
+
+            return this;
         }
 
         public void forEach(Consumer<File> consumer) {
