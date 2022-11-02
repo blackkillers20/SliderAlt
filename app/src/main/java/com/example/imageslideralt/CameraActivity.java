@@ -26,6 +26,8 @@ import com.example.imageslideralt.Ultis.ImageUtils;
 import com.example.imageslideralt.Ultis.PermissionUtils;
 import com.example.imageslideralt.Ultis.ViewUtils;
 import com.example.imageslideralt.databinding.ActivityCameraBinding;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,6 +42,7 @@ public class CameraActivity extends AppCompatActivity {
     private List<File> fileList = new ArrayList<File>();
     private CameraAdapter CameraAdapter;
     private RecyclerView recyclerView;
+    FirebaseFirestore firestore;
 
     private final LoaderManager.LoaderCallbacks<List<File>> loaderCallbacks = new LoaderManager.LoaderCallbacks<List<File>>() {
         @NonNull
@@ -79,9 +82,12 @@ public class CameraActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
+                    CollectionReference collectionReference = firestore.collection("Slider");
                     // get captured image
 //                    assert result.getData() != null;
 //                    imageDatabase.getImageDAO().insert(new ImageEntity(capturedImageFile.getName(), capturedImageFile.toURI().getPath()));
+                    ImageEntity imageEntity = new ImageEntity(captureImageFile.toURI().getPath());
+                    collectionReference.add(imageEntity);
                     ViewUtils.showSnackbar(CameraActivity.this, "Successful!");
 
                 }
@@ -94,6 +100,7 @@ public class CameraActivity extends AppCompatActivity {
         loaderManager = LoaderManager.getInstance(CameraActivity.this);
         loaderManager.initLoader(101, null, loaderCallbacks);
         binding = ActivityCameraBinding.inflate(getLayoutInflater());
+        firestore = FirebaseFirestore.getInstance();
 
     }
     @Override
